@@ -1,10 +1,11 @@
-﻿using System;
-using Assets.Scripts.WebSocket;
+﻿using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using Assets.Scripts.WebSocket.Models;
 using UnityEngine;
-using WebSocket;
 
-public class PlayerMovement : MonoBehaviour
-{
+public class OtherPlayerMovement : MonoBehaviour {
+
     public float Speed = 6f;
 
     private Vector3 _movement;
@@ -13,21 +14,26 @@ public class PlayerMovement : MonoBehaviour
 
     private int _floorMask;
     private float _camaRayLength = 100f;
+    
+    public ConcurrentQueue<ServerMovement> ServerMovements = new ConcurrentQueue<ServerMovement>(); 
 
     private void Awake()
     {
         _floorMask = LayerMask.GetMask("Floor");
         _anim = GetComponent<Animator>();
         _playerRigidbody = GetComponent<Rigidbody>();
+        ServerMovements = new ConcurrentQueue<ServerMovement>();
     }
 
     private void FixedUpdate()
     {
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
-        var mousePosition = Input.mousePosition;
-        if (h != 0 || v != 0)
-            GameStartUiManager.EventChannel.PlayerMove(GameStartUiManager.PlayerId, GameStartUiManager.RoomId, h, v, mousePosition);
+        ServerMovement serverMovement;
+        if (!ServerMovements.TryDequeue(out serverMovement))
+            return;
+
+        float h = serverMovement.Horizontal;
+        float v = serverMovement.Vertical;
+        Vector3 mousePosition = new Vector3(serverMovement.MousePositionX, serverMovement.MousePositionY, serverMovement.MousePositionZ);
         Move(h, v);
         Turning(mousePosition);
         Animating(h, v);

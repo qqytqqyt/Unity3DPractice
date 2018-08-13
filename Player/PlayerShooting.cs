@@ -34,6 +34,7 @@ public class PlayerShooting : MonoBehaviour
 
 		if(Input.GetButton ("Fire1") && _timer >= TimeBetweenBullets && Time.timeScale != 0)
         {
+            GameStartUiManager.EventChannel.PlayerShoot(GameStartUiManager.PlayerId, GameStartUiManager.RoomId);
             Shoot ();
         }
 
@@ -42,15 +43,13 @@ public class PlayerShooting : MonoBehaviour
             DisableEffects ();
         }
     }
-
-
+    
     public void DisableEffects ()
     {
         _gunLine.enabled = false;
         _gunLight.enabled = false;
     }
-
-
+    
     void Shoot ()
     {
         if (GameStartUiManager.DisableShoot)

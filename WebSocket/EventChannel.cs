@@ -56,26 +56,60 @@ namespace WebSocket
             }
         }
 
-        public void Move(int playerId, int roomId, Vector3 position)
+        public void Relocate(int playerId, int roomId, Vector3 position)
         {
             if (m_isConnected && (DateTime.Now - _lastTaskTime).Milliseconds > m_taskDelay)
             {
                 _lastTaskTime = DateTime.Now;
                 Console.WriteLine("Positioning...");
-                if (m_isConnected)
+                var message = new SocketMessage();
+                message.Action = "playerPositioning";
+                message.Data = new PositioningMessageData()
                 {
-                    var message = new SocketMessage();
-                    message.Action = "playerPositioning";
-                    message.Data = new PositioningMessageData()
-                    {
-                        PlayerId = playerId,
-                        RoomId = roomId,
-                        Position = new PositioningMessageData.PositionInfo(position.x, position.y, position.z)
-                    };
+                    PlayerId = playerId,
+                    RoomId = roomId,
+                    Position = new PositioningMessageData.PositionInfo(position.x, position.y, position.z)
+                };
 
-                    var json = JsonConvert.SerializeObject(message);
-                    WebSocket.SendAsync(json, b => Console.WriteLine("Moved"));
-                }
+                var json = JsonConvert.SerializeObject(message);
+                WebSocket.SendAsync(json, b => Console.WriteLine("Positioned"));
+            }
+        }
+
+        public void PlayerMove(int playerId, int roomId, float horizontal, float vertical, Vector3 mousePosition)
+        {
+            if (m_isConnected)
+            {
+                var message = new SocketMessage();
+                message.Action = "playerMove";
+                message.Data = new MovementMessageData()
+                {
+                    PlayerId = playerId,
+                    RoomId = roomId,
+                    Horizontal = horizontal,
+                    Vertical = vertical,
+                    MousePositionX = mousePosition.x,
+                    MousePositionY = mousePosition.y,
+                    MousePositionZ = mousePosition.z
+                };
+                var json = JsonConvert.SerializeObject(message);
+                WebSocket.SendAsync(json, b => Console.WriteLine("Moved"));
+            }
+        }
+
+        public void PlayerShoot(int playerId, int roomId)
+        {
+            if (m_isConnected)
+            {
+                var message = new SocketMessage();
+                message.Action = "playerShoot";
+                message.Data = new ShootMessageData()
+                {
+                    PlayerId = playerId,
+                    RoomId = roomId,
+                };
+                var json = JsonConvert.SerializeObject(message);
+                WebSocket.SendAsync(json, b => Console.WriteLine("Shot"));
             }
         }
     }

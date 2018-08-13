@@ -18,17 +18,17 @@ public class EnemyAttack : MonoBehaviour
     private GameObject _otherPlayer;
     private GameObject _playerBeingAttacked;
 
-    private void Awake ()
+    private void Awake()
     {
-        _player = GameObject.FindGameObjectWithTag ("Player");
-        _playerHealth = _player.GetComponent <PlayerHealth> ();
+        _player = GameObject.FindGameObjectWithTag("Player");
+        _playerHealth = _player.GetComponent<PlayerHealth>();
         _enemyHealth = GetComponent<EnemyHealth>();
-        _anim = GetComponent <Animator> ();
+        _anim = GetComponent<Animator>();
         _otherPlayer = null;
     }
 
 
-    private void OnTriggerEnter (Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         if (_otherPlayer == null)
             _otherPlayer = GameObject.FindGameObjectWithTag("OtherPlayer");
@@ -43,8 +43,8 @@ public class EnemyAttack : MonoBehaviour
             _playerInRange = true;
         }
     }
-    
-    private void OnTriggerExit (Collider other)
+
+    private void OnTriggerExit(Collider other)
     {
         if (_otherPlayer == null)
             _otherPlayer = GameObject.FindGameObjectWithTag("OtherPlayer");
@@ -62,31 +62,32 @@ public class EnemyAttack : MonoBehaviour
     }
 
 
-    private void Update ()
+    private void Update()
     {
         _timer += Time.deltaTime;
 
-        if(_timer >= TimeBetweenAttacks && _playerInRange && _enemyHealth.CurrentHealth > 0)
+        if (_timer >= TimeBetweenAttacks && _playerInRange && _enemyHealth.CurrentHealth > 0)
         {
-            Attack ();
+            Attack();
         }
 
         if (_playerHealth.CurrentHealth <= 0)
         {
-            _anim.SetTrigger ("PlayerDead");
+            _anim.SetTrigger("PlayerDead");
         }
     }
 
 
-    private void Attack ()
+    private void Attack()
     {
         _timer = 0f;
 
         var playerHealth = _playerBeingAttacked.GetComponent<PlayerHealth>();
+        if (playerHealth != null && playerHealth.CurrentHealth > 0)
+            playerHealth.TakeDamage(AttackDamage);
 
-        if (playerHealth.CurrentHealth > 0)
-        {
-            playerHealth.TakeDamage (AttackDamage);
-        }
+        var otherPlayerHealth = _playerBeingAttacked.GetComponent<OtherPlayerHealth>();
+        if (otherPlayerHealth != null && otherPlayerHealth.CurrentHealth > 0)
+            otherPlayerHealth.TakeDamage(AttackDamage);
     }
 }

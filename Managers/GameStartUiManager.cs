@@ -31,7 +31,6 @@ public class GameStartUiManager : MonoBehaviour
 	// Use this for initialization
     private void Start ()
     {
-        
         UnitySystemConsoleRedirector.Redirect();
         OriginalTimeScalse = Time.timeScale;
         Time.timeScale = 0;
@@ -40,7 +39,7 @@ public class GameStartUiManager : MonoBehaviour
         Console.WriteLine("Your playerId is " + PlayerId);
         QueueButton = GameObject.FindGameObjectWithTag("QueueButton").GetComponent<Button>();
         EventChannel.Connect();
-        EventChannel.WebSocket.OnMessage += WebSocketOnOnMessage;
+        PlayerManager.SetEventMessages(EventChannel.WebSocket);
         Console.WriteLine("Created");
     }
 	
@@ -61,33 +60,8 @@ public class GameStartUiManager : MonoBehaviour
         QueueButton.interactable = false;
     }
 
-    private void WebSocketOnOnMessage(object sender, MessageEventArgs messageEventArgs)
-    {
-        var settings = new JsonSerializerSettings();
-        settings.NullValueHandling = NullValueHandling.Ignore;
-        var message = messageEventArgs.Data;
-        var messageContent = ServerMessage.GetMessageContent(message);
-        switch (ServerMessage.GetMessageType(message))
-        {
-            case ServerMessage.PlayerSpawnType:
-                var game = JsonConvert.DeserializeObject<ServerGame>(messageContent, settings);
-                RoomId = game.RoomId;
-                UnityMainThreadDispatcher.Instance().Enqueue(() => StartGame(game));
-                break;
-            case ServerMessage.PlayerPositioningType:
-                var serverGame = JsonConvert.DeserializeObject<ServerGame>(messageContent, settings);
-                Console.WriteLine(serverGame);
-                UnityMainThreadDispatcher.Instance().Enqueue(() => PlayerManager.RelocatePlayer(serverGame));
-                break;
-            default:
-                break;
-        }
-    }
-
     private void StartGame(ServerGame game)
     {
-        Time.timeScale = OriginalTimeScalse;
-        QueueButton.gameObject.SetActive(false);
         PlayerManager.SpawnPlayer(game);
     }
 

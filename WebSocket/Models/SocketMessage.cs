@@ -29,6 +29,10 @@ namespace Assets.Scripts.WebSocket.Models
         public const string PlayerSpawnType = "playerSpawn";
 
         public const string PlayerPositioningType = "playerRelocate";
+
+        public const string PlayerMoveType = "playerMove";
+
+        public const string PlayerShootType = "playerShoot";
     }
 
     public class SocketMessage

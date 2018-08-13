@@ -70,11 +70,31 @@ namespace Assets.Scripts.WebSocket.Models
         [JsonProperty("roomId")]
         public int RoomId { get; set; }
 
-        [JsonProperty("h")]
-        public float H { get; set; }
+        [JsonProperty("horizontal")]
+        public float Horizontal { get; set; }
 
-        [JsonProperty("v")]
-        public float V { get; set; }
+        [JsonProperty("vertical")]
+        public float Vertical { get; set; }
+
+        [JsonProperty("mousePositionX")]
+        public float MousePositionX { get; set; }
+
+        [JsonProperty("mousePositionY")]
+        public float MousePositionY { get; set; }
+
+        [JsonProperty("mousePositionZ")]
+        public float MousePositionZ { get; set; }
     }
 
+    public class ShootMessageData : MessageData
+    {
+        [JsonIgnore]
+        public override string ClassName
+        {
+            get { return "Playground"; }
+        }
+
+        [JsonProperty("roomId")]
+        public int RoomId { get; set; }
+    }
 }
